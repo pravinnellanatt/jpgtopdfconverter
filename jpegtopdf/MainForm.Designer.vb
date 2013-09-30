@@ -30,6 +30,7 @@ Partial Class MainForm
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.CheckBox1 = New System.Windows.Forms.CheckBox
         Me.pbar = New System.Windows.Forms.ProgressBar
+        Me.lblProgress = New System.Windows.Forms.Label
         CType(Me.picPreview, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
@@ -113,11 +114,20 @@ Partial Class MainForm
         Me.pbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous
         Me.pbar.TabIndex = 8
         '
+        'lblProgress
+        '
+        Me.lblProgress.AutoSize = True
+        Me.lblProgress.Location = New System.Drawing.Point(176, 390)
+        Me.lblProgress.Name = "lblProgress"
+        Me.lblProgress.Size = New System.Drawing.Size(0, 13)
+        Me.lblProgress.TabIndex = 9
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(332, 433)
+        Me.Controls.Add(Me.lblProgress)
         Me.Controls.Add(Me.pbar)
         Me.Controls.Add(Me.CheckBox1)
         Me.Controls.Add(Me.GroupBox1)
@@ -143,5 +153,6 @@ Partial Class MainForm
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
     Friend WithEvents pbar As System.Windows.Forms.ProgressBar
+    Friend WithEvents lblProgress As System.Windows.Forms.Label
 
 End Class

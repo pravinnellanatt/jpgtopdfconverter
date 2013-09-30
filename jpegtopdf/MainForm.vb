@@ -1,36 +1,53 @@
 ﻿Imports Root.Reports
+Imports System.Threading
+
 Public Class MainForm
 
     Private Sub cmdConvert_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdConvert.Click
-        Dim doc As New Report(New PdfFormatter())
-        doc.formatter.pageLayout = PageLayout.SinglePage
-        doc.formatter.sCreator = "JpgtoPDF"
-        doc.formatter.sAuthor = "http://www.thetechhub.com"
+        Me.lblProgress.Text = ""
+        Me.pbar.Value = 0
+        Dim saveFileDialog As SaveFileDialog = New SaveFileDialog()
+        saveFileDialog.InitialDirectory = My.Computer.FileSystem.SpecialDirectories.Desktop
+        saveFileDialog.Filter = "PDF Files (*.PDF)|*.PDF"
+        If saveFileDialog.ShowDialog() = DialogResult.OK Then
+            Dim report As Report = New Report(New PdfFormatter())
+            report.formatter.pageLayout = PageLayout.SinglePage
+            report.formatter.sCreator = "JpgtoPDF"
+            report.formatter.sAuthor = "http://www.thetechhub.com"
+            Dim count As Integer = Me.FileList.CheckedItems.Count
+            Me.pbar.Maximum = count
+            Application.DoEvents()
+            Try
+                Dim enumerator As IEnumerator = Me.FileList.CheckedItems.GetEnumerator()
+                While enumerator.MoveNext()
+                    Dim expr_CD As Object = enumerator.Current
+                    Dim customListItem2 As CustomListItem
+                    Dim customListItem As CustomListItem = If((expr_CD IsNot Nothing), (CType(expr_CD, CustomListItem)), customListItem2)
+                    Dim page As Page = New Page(report)
+                    Dim image As Image = Me.ResizeImage(customListItem.FullPath, 190, 190, True)
+                    page.AddCB_MM(CDec((image.Height + 10)), New RepImageMM(customListItem.FullPath, CDec(image.Width), CDec(image.Height)))
+                    image.Dispose()
+                    Dim num As Integer
+                    num += 1
+                    Me.pbar.Value = num
+                    Me.pbar.Refresh()
+                    Me.lblProgress.Text = String.Format("Processing {0} of {1}", num, count)
+                    Application.DoEvents()
+                End While
 
-
-        pbar.Maximum = Me.FileList.CheckedItems.Count
-
-
-        Dim count As Integer
-        For Each item As CustomListItem In Me.FileList.CheckedItems
-            Dim pg As New Page(doc)
-
-            'best resize option found with A4 document size
-            Dim img As Image = ResizeImage(item.FileName, 190, 190, True)
-
-            pg.AddCB_MM(img.Height + 10, New RepImageMM(item.FileName, img.Width, img.Height))
-
-            img.Dispose()
-            img = Nothing
-            count += 1
-            pbar.Value = count
-            pbar.Refresh()
-            Threading.Thread.Sleep(10)
-        Next
-
-
-        doc.Save("c:\test.pdf")
-        System.Diagnostics.Process.Start("C:\test.pdf")
+                Me.lblProgress.Text = "Writing to PDF file"
+                Me.lblProgress.Refresh()
+                Thread.Sleep(10)
+                report.Save(saveFileDialog.FileName)
+                Me.lblProgress.Text = "Completed ..."
+                Thread.Sleep(10)
+                If MessageBox.Show("Do you want to open the generated PDF file?", "Information", MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) = DialogResult.Yes Then
+                    Process.Start(saveFileDialog.FileName)
+                End If
+            Catch ex As Exception
+                MessageBox.Show(ex.Message)
+            End Try
+        End If
     End Sub
 
 
